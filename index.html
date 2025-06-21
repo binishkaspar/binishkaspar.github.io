@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anto Binish Kaspar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.2;
+            color: #ffffff !important;
+            background: #0d1117;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            padding: 2rem;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        #particle-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        @keyframes waveMove {
+            0%, 100% {
+                transform: translateX(-30px) translateY(-20px) scale(1) rotate(0deg);
+            }
+            25% {
+                transform: translateX(25px) translateY(-10px) scale(1.03) rotate(0.5deg);
+            }
+            50% {
+                transform: translateX(-15px) translateY(15px) scale(0.97) rotate(-0.3deg);
+            }
+            75% {
+                transform: translateX(35px) translateY(-5px) scale(1.02) rotate(0.2deg);
+            }
+        }
+
+        @keyframes waveMove2 {
+            0%, 100% {
+                transform: translateX(20px) translateY(10px) rotate(0deg) scale(1);
+            }
+            33% {
+                transform: translateX(-25px) translateY(-15px) rotate(-0.4deg) scale(1.01);
+            }
+            66% {
+                transform: translateX(30px) translateY(8px) rotate(0.3deg) scale(0.99);
+            }
+        }
+
+        html {
+            background: #0d1117 !important;
+        }
+
+
+        .main-content {
+            text-align: center;
+            width: 100%;
+            max-width: 100vw;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .name-display {
+            margin-bottom: 3rem;
+        }
+
+        .name-line {
+            font-size: clamp(4rem, 15vw, 12rem);
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            margin: 0;
+            line-height: 0.9;
+            color: #ffffff !important;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+            text-transform: lowercase;
+        }
+
+        .name-line:first-child {
+            margin-bottom: 0.2em;
+        }
+
+        .description {
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            margin-bottom: 2rem;
+            color: #a0a9ba !important;
+            line-height: 1.6;
+            font-weight: 500;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            text-transform: lowercase;
+        }
+
+        .linkedin-link {
+            color: #ffffff !important;
+            text-decoration: underline;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-transform: lowercase;
+            text-underline-offset: 4px;
+            text-decoration-thickness: 1px;
+        }
+
+        .linkedin-link:hover {
+            color: #e0e0e0 !important;
+            text-decoration-thickness: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 2rem;
+                margin: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="particle-container"></div>
+    <div class="main-content">
+        <div class="name-display">
+            <h1 class="name-line">anto binish</h1>
+            <h1 class="name-line">kaspar</h1>
+        </div>
+        <p class="description">ceo and founder of roanuz with strong technical knowledge in ai and ml leading a million-dollar company with impactful leadership skills</p>
+        <a href="https://www.linkedin.com/in/binishkaspar/" class="linkedin-link" target="_blank" rel="noopener noreferrer">linkedin</a>
+    </div>
+    
+    <div id="three-container" style="position: fixed; bottom: 0; left: 0; width: 100%; height: 300px; z-index: 1; pointer-events: none;"></div>
+
+    <script>
+        // Particle Wave System
+        const particleScene = new THREE.Scene();
+        const particleCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const particleRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        particleRenderer.setSize(window.innerWidth, window.innerHeight);
+        particleRenderer.setClearColor(0x000000, 0);
+        document.getElementById('particle-container').appendChild(particleRenderer.domElement);
+
+        // Create particle system
+        const particleCount = 600;
+        const particles = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+        const colors = new Float32Array(particleCount * 3);
+        const sizes = new Float32Array(particleCount);
+
+        // Initialize particles
+        for (let i = 0; i < particleCount; i++) {
+            const i3 = i * 3;
+            
+            // Position - spread far across screen
+            positions[i3] = (Math.random() - 0.5) * 100;     // x
+            positions[i3 + 1] = (Math.random() - 0.5) * 80;  // y
+            positions[i3 + 2] = (Math.random() - 0.5) * 50;  // z
+            
+            // Color (not used with PointsMaterial color property)
+            colors[i3] = 1;     // R
+            colors[i3 + 1] = 1; // G
+            colors[i3 + 2] = 1; // B
+            
+            // Size
+            sizes[i] = Math.random() * 0.5;
+        }
+
+        particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        particles.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        particles.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+        // Use simple PointsMaterial instead of shader
+        const particleMaterial = new THREE.PointsMaterial({
+            color: 0xffdd99,
+            size: 0.2,
+            transparent: true,
+            opacity: 0.4,
+            alphaTest: 0.1,
+            blending: THREE.AdditiveBlending,
+            sizeAttenuation: true,
+        });
+
+
+        const particleSystem = new THREE.Points(particles, particleMaterial);
+        particleScene.add(particleSystem);
+
+        // Position particle camera far back
+        particleCamera.position.z = 30;
+
+        // Three.js scene setup for robot
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / 300, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, 300);
+        renderer.setClearColor(0x000000, 0);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document.getElementById('three-container').appendChild(renderer.domElement);
+
+        // Create Pixar-style cute robot
+        const robot = new THREE.Group();
+        robot.scale.set(0.8, 0.8, 0.8);
+        
+        // Robot body (rounded cube)
+        const bodyGeometry = new THREE.BoxGeometry(1.5, 2, 1.2);
+        const bodyMaterial = new THREE.MeshLambertMaterial({ 
+            color: 0xff6b6b
+        });
+        const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+        body.position.y = 0;
+        robot.add(body);
+        
+        // Robot head (sphere)
+        const headGeometry = new THREE.SphereGeometry(0.8, 32, 32);
+        const headMaterial = new THREE.MeshLambertMaterial({ 
+            color: 0x4ecdc4
+        });
+        const head = new THREE.Mesh(headGeometry, headMaterial);
+        head.position.y = 1.8;
+        robot.add(head);
+        
+        // Eyes (spheres)
+        const eyeGeometry = new THREE.SphereGeometry(0.15, 16, 16);
+        const eyeMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+        
+        const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+        leftEye.position.set(-0.25, 1.9, 0.6);
+        robot.add(leftEye);
+        
+        const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+        rightEye.position.set(0.25, 1.9, 0.6);
+        robot.add(rightEye);
+        
+        // Eye pupils
+        const pupilGeometry = new THREE.SphereGeometry(0.08, 16, 16);
+        const pupilMaterial = new THREE.MeshLambertMaterial({ color: 0x000000 });
+        
+        const leftPupil = new THREE.Mesh(pupilGeometry, pupilMaterial);
+        leftPupil.position.set(-0.25, 1.9, 0.68);
+        robot.add(leftPupil);
+        
+        const rightPupil = new THREE.Mesh(pupilGeometry, pupilMaterial);
+        rightPupil.position.set(0.25, 1.9, 0.68);
+        robot.add(rightPupil);
+        
+        // Arms
+        const armGeometry = new THREE.CylinderGeometry(0.2, 0.2, 1.2, 16);
+        const armMaterial = new THREE.MeshLambertMaterial({ 
+            color: 0xffd93d
+        });
+        
+        const leftArm = new THREE.Mesh(armGeometry, armMaterial);
+        leftArm.position.set(-1.2, 0.2, 0);
+        leftArm.rotation.z = 0.3;
+        robot.add(leftArm);
+        
+        const rightArm = new THREE.Mesh(armGeometry, armMaterial);
+        rightArm.position.set(1.2, 0.2, 0);
+        rightArm.rotation.z = -0.3;
+        robot.add(rightArm);
+        
+        // Hands (spheres)
+        const handGeometry = new THREE.SphereGeometry(0.25, 16, 16);
+        const handMaterial = new THREE.MeshLambertMaterial({ 
+            color: 0xa8e6cf
+        });
+        
+        const leftHand = new THREE.Mesh(handGeometry, handMaterial);
+        leftHand.position.set(-1.6, -0.4, 0);
+        robot.add(leftHand);
+        
+        const rightHand = new THREE.Mesh(handGeometry, handMaterial);
+        rightHand.position.set(1.6, -0.4, 0);
+        robot.add(rightHand);
+        
+        // Legs
+        const legGeometry = new THREE.CylinderGeometry(0.25, 0.25, 1.5, 16);
+        const legMaterial = new THREE.MeshLambertMaterial({ 
+            color: 0x9b59b6
+        });
+        
+        const leftLeg = new THREE.Mesh(legGeometry, legMaterial);
+        leftLeg.position.set(-0.4, -1.7, 0);
+        robot.add(leftLeg);
+        
+        const rightLeg = new THREE.Mesh(legGeometry, legMaterial);
+        rightLeg.position.set(0.4, -1.7, 0);
+        robot.add(rightLeg);
+        
+        // Feet
+        const footGeometry = new THREE.BoxGeometry(0.6, 0.3, 0.8);
+        const footMaterial = new THREE.MeshLambertMaterial({ 
+            color: 0x34495e
+        });
+        
+        const leftFoot = new THREE.Mesh(footGeometry, footMaterial);
+        leftFoot.position.set(-0.4, -2.6, 0.2);
+        robot.add(leftFoot);
+        
+        const rightFoot = new THREE.Mesh(footGeometry, footMaterial);
+        rightFoot.position.set(0.4, -2.6, 0.2);
+        robot.add(rightFoot);
+        
+        // Antenna
+        const antennaGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.8, 8);
+        const antennaMaterial = new THREE.MeshLambertMaterial({ color: 0xe74c3c });
+        const antenna = new THREE.Mesh(antennaGeometry, antennaMaterial);
+        antenna.position.set(0, 2.8, 0);
+        robot.add(antenna);
+        
+        // Antenna ball
+        const antennaBallGeometry = new THREE.SphereGeometry(0.15, 16, 16);
+        const antennaBallMaterial = new THREE.MeshLambertMaterial({ 
+            color: 0xf39c12
+        });
+        const antennaBall = new THREE.Mesh(antennaBallGeometry, antennaBallMaterial);
+        antennaBall.position.set(0, 3.3, 0);
+        robot.add(antennaBall);
+        
+        scene.add(robot);
+        
+        // Lighting for bright, colorful appearance
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        scene.add(ambientLight);
+        
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+        directionalLight.position.set(5, 10, 5);
+        scene.add(directionalLight);
+        
+        // Add another light to ensure visibility
+        const pointLight = new THREE.PointLight(0xffffff, 0.6, 100);
+        pointLight.position.set(0, 5, 5);
+        scene.add(pointLight);
+        
+        // Position camera
+        camera.position.set(0, 0, 5);
+        camera.lookAt(0, 0, 0);
+        
+        // Animation variables
+        let time = 0;
+        
+        // Animation loop with bouncy movements
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.02;
+            
+            // Update particle wave system
+            const positions = particleSystem.geometry.attributes.position.array;
+            for (let i = 0; i < particleCount; i++) {
+                const i3 = i * 3;
+                const x = positions[i3];
+                const y = positions[i3 + 1];
+                
+                // Create wave movement
+                positions[i3 + 1] = y + Math.sin(x * 0.1 + time * 0.5) * 0.02;
+                positions[i3] = x + Math.cos(y * 0.1 + time * 0.3) * 0.01;
+            }
+            particleSystem.geometry.attributes.position.needsUpdate = true;
+            
+            particleRenderer.render(particleScene, particleCamera);
+            
+            // Gentle floating animation for robot
+            robot.position.y = Math.sin(time) * 0.3 - 1;
+            robot.rotation.y += 0.008;
+            
+            // Animate antenna ball
+            antennaBall.rotation.x = time * 2;
+            antennaBall.rotation.z = time * 1.5;
+            
+            // Gentle arm sway
+            leftArm.rotation.z = 0.3 + Math.sin(time * 1.2) * 0.2;
+            rightArm.rotation.z = -0.3 - Math.sin(time * 1.2) * 0.2;
+            
+            renderer.render(scene, camera);
+        }
+        animate();
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            // Particle system resize
+            particleCamera.aspect = window.innerWidth / window.innerHeight;
+            particleCamera.updateProjectionMatrix();
+            particleRenderer.setSize(window.innerWidth, window.innerHeight);
+            
+            // Robot system resize
+            camera.aspect = window.innerWidth / 300;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, 300);
+        });
+    </script>
+</body>
+</html>
